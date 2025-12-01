@@ -98,8 +98,8 @@ public class Wordle {
         char[][] guesses = new char[6][5];
         char[][] results = new char[6][5];
 
-        // Prepare to read from the standart input
-        In inp = new In();
+        // Prepare to read from the standard input
+        In in = new In();
 
         int attempt = 0;
         boolean won = false;
@@ -109,7 +109,6 @@ public class Wordle {
             String guess = "";
             boolean valid = false;
 
-            In in = new In();
             // Loop until you read a valid guess
             while (!valid) {
                 System.out.print("Enter your guess (5-letter word): ");
@@ -143,6 +142,6 @@ public class Wordle {
             System.out.printf("Sorry, you did not guess the word.%nThe secret word was: %s%n", secret);
         }
 
-        inp.close();
+        in.close();
     }
 }
