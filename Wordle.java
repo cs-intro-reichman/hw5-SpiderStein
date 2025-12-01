@@ -25,39 +25,38 @@ public class Wordle {
     }
 
     // G for exact match, Y if letter appears anywhere else, _ otherwise.
-    public static void computeFeedback(String secret, String guess, char[][][] attemptToGuessAndResults, int attempt) {
+    public static void computeFeedback(String secret, String guess, char[] result) {
         for (int i = 0; i < secret.length(); i++) {
             char chr = guess.charAt(i);
-            if (secret.indexOf(chr) != 1) {
+            if (secret.indexOf(chr) != -1) {
                 if (secret.charAt(i) == chr) {
-                    attemptToGuessAndResults[attempt][1][i] = 'G';
+                    result[i] = 'G';
                 } else {
-                    attemptToGuessAndResults[attempt][1][i] = 'Y';
+                    result[i] = 'Y';
                 }
             } else {
-                attemptToGuessAndResults[attempt][1][i] = '_';
+                result[i] = '_';
             }
         }
     }
 
-
-    public static void storeGuess(String guess, char[][][] attemptToGuessAndResults, int attempt) {
+    public static void storeGuess(String guess, char[][] guesses, int attempt) {
         for (int i = 0; i < guess.length(); i++) {
-            attemptToGuessAndResults[attempt][0][i] = guess.charAt(i);
+            guesses[attempt][i] = guess.charAt(i);
         }
     }
 
     // Prints the game board up to currentRow (inclusive).
-    public static void printBoard(char[][][] attemptToGuessAndResults, int currentRow) {
+    public static void printBoard(char[][] guesses, char[][] results, int currentRow) {
         System.out.println("Current board:");
         for (int row = 0; row <= currentRow; row++) {
             System.out.print("Guess " + (row + 1) + ": ");
-            for (int col = 0; col < attemptToGuessAndResults[row][0].length; col++) {
-                System.out.print(attemptToGuessAndResults[row][0][col]);
+            for (int col = 0; col < guesses[row].length; col++) {
+                System.out.print(guesses[row][col]);
             }
             System.out.print("   Result: ");
-            for (int col = 0; col < attemptToGuessAndResults[row][1].length; col++) {
-                System.out.print(attemptToGuessAndResults[row][1][col]);
+            for (int col = 0; col < results[row].length; col++) {
+                System.out.print(results[row][col]);
             }
             System.out.println();
         }
@@ -88,7 +87,7 @@ public class Wordle {
 
         int WORD_LENGTH = 5;
         int MAX_ATTEMPTS = 6;
-        
+
         // Read dictionary
         String[] dict = readDictionary("dictionary.txt");
 
@@ -96,9 +95,10 @@ public class Wordle {
         String secret = chooseSecretWord(dict);
 
         // Prepare 2D arrays for guesses and results
-        char[][][] attemptToGuessAndResults = new char[6][2][5];
+        char[][] guesses = new char[6][5];
+        char[][] results = new char[6][5];
 
-        // Prepare to read from the standart input 
+        // Prepare to read from the standart input
         In inp = new In();
 
         int attempt = 0;
@@ -109,11 +109,11 @@ public class Wordle {
             String guess = "";
             boolean valid = false;
 
-            In in = new In();            
+            In in = new In();
             // Loop until you read a valid guess
             while (!valid) {
                 System.out.print("Enter your guess (5-letter word): ");
-                
+
                 guess = in.readLine();
                 if (guess.length() != WORD_LENGTH || !isAllChars(guess)) {
                     System.out.println("Invalid word. Please try again.");
@@ -123,14 +123,14 @@ public class Wordle {
             }
 
             // Store guess and compute feedback
-            storeGuess(guess, attemptToGuessAndResults, attempt);
-            computeFeedback(secret, guess, attemptToGuessAndResults, attempt);
+            storeGuess(guess, guesses, attempt);
+            computeFeedback(secret, guess, results[attempt]);
 
             // Print board
-            printBoard(attemptToGuessAndResults, attempt);
+            printBoard(guesses, results, attempt);
 
             // Check win
-            if (isAllGreen(attemptToGuessAndResults[attempt][1])) {
+            if (isAllGreen(results[attempt])) {
                 System.out.println("Congratulations! You guessed the word in " + (attempt + 1) + " attempts.");
                 won = true;
             }
